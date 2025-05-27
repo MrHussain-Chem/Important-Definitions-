@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>So You Think You Know Your Definitions - AS Chemistry Quiz</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .quiz-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .quiz-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .quiz-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .grade-display {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            border-left: 5px solid #4facfe;
+            text-align: center;
+        }
+        
+        .quiz-content {
+            padding: 30px;
+        }
+        
+        .timer-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .timer-warning {
+            background: linear-gradient(135deg, #ff9500, #ff6b00) !important;
+            animation: pulse 1s infinite;
+        }
+        
+        .timer-critical {
+            background: linear-gradient(135deg, #ff3838, #ff1744) !important;
+            animation: pulse 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .start-screen {
+            text-align: center;
+            padding: 50px 30px;
+        }
+        
+        .start-screen h2 {
+            color: #4facfe;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        
+        .start-screen p {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+        
+        .quiz-area {
+            display: none;
+        }
+        
+        .quiz-area.active {
+            display: block;
+        }
+        
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4facfe;
+            transition: all 0.3s ease;
+        }
+        
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .question-number {
+            color: #4facfe;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .question {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .topic-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .answer-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .answer-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #4facfe;
+            font-weight: bold;
+        }
+        
+        .answer-feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .model-answer {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+                    <div class="quiz-header">
+            <h1>So You Think You Know Your Definitions?</h1>
+            <p>AQA AS Chemistry - Year 12 Complete Review</p>
+            <p style="font-size: 1em; opacity: 0.8;">Complete the quiz and receive your grade based on your performance</p>
+        </div>
+        
+        <div class="quiz-content">
+            <div class="timer-display" id="timerDisplay">
+                Time Remaining: 110:00
+            </div>
+            
+            <div class="start-screen" id="startScreen">
+                <h2>So You Think You Know Your Definitions?</h2>
+                <p><strong>119 Questions</strong> covering all essential AS Chemistry definitions</p>
+                <p>You have <strong>110 minutes</strong> to complete this quiz</p>
+                <p>Once you start, the timer will begin and cannot be paused</p>
+                <p>You can check your answers and see your grade at any time</p>
+                <button class="start-btn" id="startQuizBtn">Start Quiz</button>
+            </div>
+            
+            <div class="quiz-area" id="quizArea">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div id="questionsContainer">
+                    <!-- Questions will be inserted here -->
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="checkAnswers">Check All Answers</button>
+                    <button class="btn btn-secondary" id="resetQuiz">Reset Quiz</button>
+                    <button class="btn btn-secondary" id="showAnswers">Show All Answers</button>
+                </div>
+                
+                <div class="score-display" id="scoreDisplay"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            // Physical Chemistry - Atomic Structure & Amount of Substance
+            { topic: "Amount of Substance", term: "Relative atomic mass (Ar)", answer: "The weighted mean mass of an atom of an element compared with one-twelfth of the mass of an atom of carbon-12" },
+            { topic: "Amount of Substance", term: "Relative molecular mass (Mr)", answer: "The weighted mean mass of a molecule compared with one-twelfth of the mass of an atom of carbon-12" },
+            { topic: "Amount of Substance", term: "Mole", answer: "The amount of substance containing as many particles as there are carbon atoms in exactly 12g of carbon-12" },
+            { topic: "Amount of Substance", term: "Avogadro constant", answer: "The number of atoms per mole of carbon-12 (6.022 × 10²³ mol⁻¹)" },
+            { topic: "Amount of Substance", term: "Molar mass", answer: "The mass per mole of a substance (units: g mol⁻¹)" },
+            { topic: "Amount of Substance", term: "Empirical formula", answer: "The simplest whole number ratio of atoms of each element present in a compound" },
+            { topic: "Amount of Substance", term: "Molecular formula", answer: "The actual number of atoms of each element in a molecule" },
+            { topic: "Amount of Substance", term: "Percentage yield", answer: "(Actual yield ÷ Theoretical yield) × 100" },
+            { topic: "Amount of Substance", term: "Atom economy", answer: "(Molecular mass of desired product ÷ Sum of molecular masses of all reactants) × 100" },
+            { topic: "Amount of Substance", term: "Standard solution", answer: "A solution of known concentration" },
+            { topic: "Amount of Substance", term: "Concordant results", answer: "Titration results that are within 0.10 cm³ of each other" },
+            
+            // Atomic Structure
+            { topic: "Atomic Structure", term: "Isotopes", answer: "Atoms of the same element with different numbers of neutrons" },
+            { topic: "Atomic Structure", term: "Relative isotopic mass", answer: "The mass of an atom of an isotope compared with one-twelfth of the mass of an atom of carbon-12" },
+            { topic: "Atomic Structure", term: "Time of flight mass spectrometry", answer: "An analytical technique used to identify different isotopes and find the overall relative atomic mass of an element" },
+            { topic: "Atomic Structure", term: "Electron configuration", answer: "The arrangement of electrons in atomic orbitals" },
+            { topic: "Atomic Structure", term: "Orbital", answer: "A region around the nucleus that can hold up to two electrons with opposite spins" },
+            { topic: "Atomic Structure", term: "First ionisation energy", answer: "The energy required to remove one electron from each atom in one mole of gaseous atoms to form one mole of gaseous 1+ ions" },
+            { topic: "Atomic Structure", term: "Electron affinity", answer: "The energy change when one electron is added to each atom in one mole of gaseous atoms to form one mole of gaseous 1- ions" },
+            { topic: "Atomic Structure", term: "Successive ionisation energies", answer: "A measure of the energy required to remove each electron in turn" },
+            { topic: "Atomic Structure", term: "Atomic radius", answer: "Half the distance between the nuclei of two atoms of the same element that are joined together by a single covalent bond" },
+            
+            // Bonding
+            { topic: "Bonding", term: "Ionic bonding", answer: "The electrostatic attraction between oppositely charged ions" },
+            { topic: "Bonding", term: "Covalent bonding", answer: "The strong electrostatic attraction between a shared pair of electrons and the nuclei of the bonded atoms" },
+            { topic: "Bonding", term: "Dative covalent bond (coordinate bond)", answer: "A shared pair of electrons which has been provided by one of the bonding atoms only" },
+            { topic: "Bonding", term: "Metallic bonding", answer: "The electrostatic attraction between cations and delocalised electrons" },
+            { topic: "Bonding", term: "Electronegativity", answer: "An atoms ability to pull or withdraw a shared pair of electrons towards itself in a covalent bond" },
+            { topic: "Bonding", term: "Polar", answer: "An uneven distribution of electrons caused by difference in electronegativity" },
+            { topic: "Bonding", term: "Polar covalent bond", answer: "A bond with a permanent dipole" },
+            { topic: "Bonding", term: "Van der Waals' forces", answer: "Weakest intermolecular force between non-polar and polar molecules" },
+            { topic: "Bonding", term: "London forces (induced dipole-dipole forces)", answer: "Weak intermolecular forces of attraction between molecules caused by temporary dipoles" },
+            { topic: "Bonding", term: "Hydrogen bonding", answer: "A strong dipole-dipole attraction between molecules containing N-H, O-H or F-H bonds" },
+            { topic: "Bonding", term: "Giant covalent structure", answer: "A three-dimensional structure of covalently bonded atoms" },
+            { topic: "Bonding", term: "Simple molecular structure", answer: "A structure containing molecules held together by weak intermolecular forces" },
+            
+            // Energetics
+            { topic: "Energetics", term: "Enthalpy change (ΔH)", answer: "The heat energy transferred in a reaction at constant pressure" },
+            { topic: "Energetics", term: "Standard conditions", answer: "100 kPa pressure and a specified temperature, usually 298K" },
+            { topic: "Energetics", term: "Standard enthalpy change of formation (ΔHf°)", answer: "The energy transferred when 1 mole of a compound is formed from its constituent elements in their standard states under standard conditions" },
+            { topic: "Energetics", term: "Standard enthalpy change of combustion (ΔHc°)", answer: "The energy transferred when 1 mole of a substance is completely burned in oxygen under standard conditions" },
+            { topic: "Energetics", term: "Bond dissociation enthalpy", answer: "The standard molar enthalpy change when one mole of a covalent bond is broken into two gaseous atoms (or free radicals)" },
+            { topic: "Energetics", term: "Mean bond enthalpy", answer: "The average enthalpy required to break one mole of a given type of covalent bonds in the molecules of a gaseous species" },
+            { topic: "Energetics", term: "Hess's Law", answer: "If a reaction can take place by more than one route and the initial and final conditions are the same, the total enthalpy change is the same for each route" },
+            { topic: "Energetics", term: "Calorimetry", answer: "The measurement of enthalpy changes during chemical reactions" },
+            { topic: "Energetics", term: "Specific heat capacity", answer: "The energy required to raise the temperature of 1g of a substance by 1K" },
+            
+            // Kinetics
+            { topic: "Kinetics", term: "Rate of reaction", answer: "The change in concentration of a reactant or product in a given time" },
+            { topic: "Kinetics", term: "Activation energy", answer: "The minimum energy required to start a reaction by the breaking of bonds" },
+            { topic: "Kinetics", term: "Catalyst", answer: "A substance that increases the rate of a chemical reaction without being permanently changed in the process" },
+            { topic: "Kinetics", term: "Maxwell-Boltzmann distribution", answer: "The distribution of energies of molecules at a particular temperature, often shown as a graph" },
+            { topic: "Kinetics", term: "Collision theory", answer: "A reaction occurs when molecules collide with the correct orientation and with energy greater than the activation energy" },
+            { topic: "Kinetics", term: "Boltzmann constant", answer: "The gas constant divided by Avogadro's constant (1.38 × 10⁻²³ J K⁻¹)" },
+            
+            // Equilibria
+            { topic: "Equilibria", term: "Dynamic equilibrium", answer: "The equilibrium that exists in a closed system when the rate of the forward reaction is equal to the rate of the reverse reaction" },
+            { topic: "Equilibria", term: "Le Chatelier's principle", answer: "When a system in dynamic equilibrium is subject to change, the position of equilibrium will shift to minimise the change" },
+            { topic: "Equilibria", term: "Equilibrium constant (Kc)", answer: "For the equilibrium aA + bB ⇌ cC + dD, Kc = [C]^c[D]^d/[A]^a[B]^b" },
+            { topic: "Equilibria", term: "Homogeneous equilibrium", answer: "An equilibrium in which all the equilibrium species are in the same phase" },
+            { topic: "Equilibria", term: "Heterogeneous equilibrium", answer: "An equilibrium in which the equilibrium species are in different phases" },
+            
+            // Inorganic Chemistry - Group 2
+            { topic: "Group 2", term: "Thermal decomposition", answer: "The breakdown of a compound by heat into two or more different substances" },
+            { topic: "Group 2", term: "First ionisation energy", answer: "The energy required to remove one electron from each atom in one mole of gaseous atoms to form one mole of gaseous 1+ ions" },
+            { topic: "Group 2", term: "Hydroxide", answer: "A compound containing the OH⁻ ion" },
+            { topic: "Group 2", term: "Precipitation reaction", answer: "The formation of a solid from a solution during a chemical reaction" },
+            
+            // Group 7 (Halogens)
+            { topic: "Group 7", term: "Halogen", answer: "An element in Group 7 of the Periodic Table" },
+            { topic: "Group 7", term: "Disproportionation", answer: "The oxidation and reduction of the same element in a redox reaction" },
+            { topic: "Group 7", term: "Displacement reaction", answer: "A reaction in which a more reactive element displaces a less reactive element from its compounds" },
+            { topic: "Group 7", term: "Halide", answer: "A compound containing a halogen in the -1 oxidation state" },
+            { topic: "Group 7", term: "Silver nitrate test", answer: "A test for halide ions using silver nitrate solution and ammonia" },
+            
+            // Organic Chemistry - Introduction
+            { topic: "Organic Chemistry", term: "Hydrocarbon", answer: "A compound containing carbon and hydrogen only" },
+            { topic: "Organic Chemistry", term: "Saturated", answer: "Contains single bonds only" },
+            { topic: "Organic Chemistry", term: "Unsaturated", answer: "Contains C=C double bonds" },
+            { topic: "Organic Chemistry", term: "Homologous series", answer: "A series of organic compounds having the same functional group but with each successive member differing by CH₂" },
+            { topic: "Organic Chemistry", term: "Functional group", answer: "The part of the organic molecule that is largely responsible for the molecule's chemical properties" },
+            { topic: "Organic Chemistry", term: "Aliphatic", answer: "A compound containing carbon and hydrogen joined together in straight chains, branched chains or non-aromatic rings" },
+            { topic: "Organic Chemistry", term: "Alicyclic", answer: "An aliphatic compound arranged in non-aromatic rings with or without side chains" },
+            { topic: "Organic Chemistry", term: "Aromatic", answer: "A compound containing a benzene ring" },
+            { topic: "Organic Chemistry", term: "Structural isomers", answer: "Compounds with the same molecular formula but different structural formulae" },
+            { topic: "Organic Chemistry", term: "Chain isomers", answer: "Compounds with the same molecular formula but different arrangements of the carbon skeleton" },
+            { topic: "Organic Chemistry", term: "Position isomers", answer: "Compounds with the same molecular formula but different positions of the same functional group on the same carbon skeleton" },
+            { topic: "Organic Chemistry", term: "Functional group isomers", answer: "Compounds with the same molecular formula but with atoms arranged to give different functional groups" },
+            { topic: "Organic Chemistry", term: "Double headed arrow in a mechanism", answer: "Movement of a pair of electrons" },
+            { topic: "Organic Chemistry", term: "Fraction", answer: "A mixture of hydrocarbons with similar boiling points or similar Mr" },
+            { topic: "Organic Chemistry", term: "Stereoisomerism", answer: "Compounds with the same structural formula but have different spatial arrangement of atoms" },
+            { topic: "Organic Chemistry", term: "Z-isomer", answer: "An alkene isomer with the highest priority groups on the same side of the double bond" },
+            { topic: "Organic Chemistry", term: "E-isomer", answer: "An alkene isomer with the highest priority groups on opposite sides of the double bond" },
+            
+            // Alkanes
+            { topic: "Alkanes", term: "Alkane", answer: "A saturated hydrocarbon" },
+            { topic: "Alkanes", term: "Petroleum", answer: "A mixture consisting mainly of alkane hydrocarbons" },
+            { topic: "Alkanes", term: "Fractional distillation", answer: "The separation of the components in a liquid mixture into fractions which differ in boiling point by means of distillation" },
+            { topic: "Alkanes", term: "Cracking", answer: "The breaking down of long chained saturated hydrocarbons to give shorter chained alkanes and alkenes" },
+            { topic: "Alkanes", term: "Thermal cracking", answer: "The breaking of C-C bonds by heating alkanes to a high temperature" },
+            { topic: "Alkanes", term: "Catalytic cracking", answer: "The breaking of C-C bonds in alkanes by heating with a catalyst" },
+            { topic: "Alkanes", term: "Free radical", answer: "A species with an unpaired electron" },
+            { topic: "Alkanes", term: "Free radical substitution", answer: "A reaction in which a free radical replaces (substitutes) for another atom or group of atoms" },
+            { topic: "Alkanes", term: "Homolytic fission", answer: "The breaking of a covalent bond with one of the bonded electrons going to each atom, forming two radicals" },
+            { topic: "Alkanes", term: "Heterolytic fission", answer: "The breaking of a covalent bond with both of the bonded electrons going to one of the atoms, forming a cation (+) and an anion (-)" },
+            { topic: "Alkanes", term: "Initiation", answer: "The first step in a free radical substitution in which the free radicals are created" },
+            { topic: "Alkanes", term: "Propagation", answer: "The two steps in a free radical substitution that use up reactants and form products" },
+            { topic: "Alkanes", term: "Termination", answer: "The step in a free radical substitution where two free radicals are removed" },
+            
+            // Alkenes
+            { topic: "Alkenes", term: "Alkene", answer: "An unsaturated hydrocarbon containing a C=C double bond" },
+            { topic: "Alkenes", term: "π (pi) bond", answer: "The reactive part of a double bond formed above and below the plane of the bonded atoms by sideways overlap of p orbitals" },
+            { topic: "Alkenes", term: "Addition reaction", answer: "A reaction in which a reactant is added to an unsaturated molecule to make a saturated molecule" },
+            { topic: "Alkenes", term: "Electrophile", answer: "An atom (or group of atoms) that is attracted to an electron-rich centre or atom, where it accepts a pair of electrons to form a new covalent bond" },
+            { topic: "Alkenes", term: "Electrophilic addition", answer: "A type of addition reaction where an electrophile is attracted to an electron-rich centre or atom" },
+            { topic: "Alkenes", term: "Carbocation", answer: "An organic ion containing a positively charged carbon atom" },
+            { topic: "Alkenes", term: "Addition polymerisation", answer: "The process in which unsaturated alkene molecules (monomers) add on to a growing polymer chain one at a time to form a very long saturated molecular chain (the addition polymer)" },
+            { topic: "Alkenes", term: "Monomer", answer: "A small molecule that combines with many others like it to form a polymer" },
+            { topic: "Alkenes", term: "Polymer", answer: "A substance of high molecular mass made by combining a large number of repeating units (monomers)" },
+            
+            // Alcohols
+            { topic: "Alcohols", term: "Alcohol", answer: "An organic compound containing the hydroxyl functional group, -OH" },
+            { topic: "Alcohols", term: "Primary alcohol", answer: "An alcohol containing the C-OH group attached to a carbon atom that is attached to two hydrogen atoms and one alkyl group" },
+            { topic: "Alcohols", term: "Secondary alcohol", answer: "An alcohol containing the C-OH group attached to a carbon atom that is attached to one hydrogen atom and two alkyl groups" },
+            { topic: "Alcohols", term: "Tertiary alcohol", answer: "An alcohol containing the C-OH group attached to a carbon atom that is attached to no hydrogen atoms and three alkyl groups" },
+            { topic: "Alcohols", term: "Volatility", answer: "The tendency of a substance to vaporise" },
+            { topic: "Alcohols", term: "Miscibility", answer: "The ability of a liquid to mix completely with another liquid" },
+            { topic: "Alcohols", term: "Elimination reaction", answer: "A reaction in which a simple molecule leaves the organic molecule" },
+            { topic: "Alcohols", term: "Dehydration", answer: "An elimination reaction in which water is removed from a saturated molecule to make an unsaturated molecule" },
+            { topic: "Alcohols", term: "Oxidation", answer: "A reaction in which an atom loses electrons. In organic chemistry this often involves the loss of hydrogen or the gain of oxygen" },
+            { topic: "Alcohols", term: "Aldehyde", answer: "A compound containing the functional group -CHO" },
+            { topic: "Alcohols", term: "Ketone", answer: "A compound containing the functional group C=O joined to two carbon atoms" },
+            { topic: "Alcohols", term: "Carboxylic acid", answer: "A compound containing the functional group -COOH" },
+            
+            // Halogenoalkanes
+            { topic: "Halogenoalkanes", term: "Halogenoalkane", answer: "An alkane with at least one halogen atom in place of a hydrogen atom" },
+            { topic: "Halogenoalkanes", term: "Primary halogenoalkane", answer: "A halogenoalkane containing the C-X group attached to a carbon atom that is attached to two hydrogen atoms and one alkyl group" },
+            { topic: "Halogenoalkanes", term: "Secondary halogenoalkane", answer: "A halogenoalkane containing the C-X group attached to a carbon atom that is attached to one hydrogen atom and two alkyl groups" },
+            { topic: "Halogenoalkanes", term: "Tertiary halogenoalkane", answer: "A halogenoalkane containing the C-X group attached to a carbon atom that is attached to no hydrogen atoms and three alkyl groups" },
+            { topic: "Halogenoalkanes", term: "Nucleophile", answer: "An atom (or group of atoms) that is attracted to an electron-deficient centre or atom, where it donates a pair of electrons to form a new covalent bond" },
+            { topic: "Halogenoalkanes", term: "Nucleophilic substitution", answer: "A type of substitution reaction where a nucleophile is attracted to an electron-deficient centre or atom" },
+            { topic: "Halogenoalkanes", term: "Hydrolysis", answer: "A reaction with water or aqueous hydroxide ions that breaks a chemical bond" },
+            { topic: "Halogenoalkanes", term: "Substitution reaction", answer: "A reaction in which one atom or group of atoms is replaced by another atom or group of atoms" },
+            { topic: "Halogenoalkanes", term: "CFC", answer: "Chlorofluorocarbon - a halogenoalkane containing both chlorine and fluorine atoms but no hydrogen atoms" },
+            { topic: "Halogenoalkanes", term: "Ozone depletion", answer: "The breakdown of ozone molecules in the stratosphere" },
+            
+            // Redox
+            { topic: "Redox", term: "Oxidation", answer: "Loss of electrons" },
+            { topic: "Redox", term: "Reduction", answer: "Gain of electrons" },
+            { topic: "Redox", term: "Oxidising agent", answer: "A reagent that oxidises (removes electrons from) another species" },
+            { topic: "Redox", term: "Reducing agent", answer: "A reagent that reduces (adds electrons to) another species" },
+            { topic: "Redox", term: "Oxidation number (oxidation state)", answer: "A measure of the number of electrons that an atom uses to bond with atoms of another element" },
+            { topic: "Redox", term: "Redox reaction", answer: "A reaction in which both reduction and oxidation occur" }
+        ];
+
+        let currentAnswers = {};
+        let showingAnswers = false;
+        let timerInterval;
+        let timeRemaining = 110 * 60; // 110 minutes in seconds
+        let quizStarted = false;
+
+        function startTimer() {
+            const timerDisplay = document.getElementById('timerDisplay');
+            timerDisplay.style.display = 'block';
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                const displayTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                timerDisplay.textContent = `Time Remaining: ${displayTime}`;
+                
+                // Change timer color based on time remaining
+                if (timeRemaining <= 300) { // Last 5 minutes - critical
+                    timerDisplay.className = 'timer-display timer-critical';
+                } else if (timeRemaining <= 900) { // Last 15 minutes - warning
+                    timerDisplay.className = 'timer-display timer-warning';
+                }
+                
+                // Auto-submit when time runs out
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    timeUp();
+                }
+            }, 1000);
+        }
+
+        function timeUp() {
+            alert('Time is up! Your quiz will be automatically submitted.');
+            checkAnswers();
+            
+            // Disable all inputs
+            const inputs = document.querySelectorAll('.answer-input');
+            inputs.forEach(input => input.disabled = true);
+            
+            // Disable buttons except reset
+            document.getElementById('checkAnswers').disabled = true;
+            document.getElementById('showAnswers').disabled = true;
+            
+            // Track time up event
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'quiz_time_up', {
+                    'event_category': 'Quiz Interaction',
+                    'event_label': 'Time Expired'
+                });
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('quizArea').classList.add('active');
+            quizStarted = true;
+            startTimer();
+            
+            // Track quiz start
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'quiz_started', {
+                    'event_category': 'Quiz Interaction',
+                    'event_label': 'Quiz Started'
+                });
+            }
+        }
+
+        function renderQuiz() {
+            const questionsContainer = document.getElementById('questionsContainer');
+            questionsContainer.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-card';
+                questionDiv.innerHTML = `
+                    <div class="question-number">Question ${index + 1}</div>
+                    <div class="topic-tag">${q.topic}</div>
+                    <div class="question">Define: <strong>${q.term}</strong></div>
+                    <textarea class="answer-input" id="answer-${index}" placeholder="Enter your definition here..."></textarea>
+                    <div class="answer-feedback" id="feedback-${index}"></div>
+                `;
+                questionsContainer.appendChild(questionDiv);
+            });
+
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answeredQuestions = Object.keys(currentAnswers).length;
+            const progressPercent = (answeredQuestions / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+        }
+
+        function getGrade(percentage) {
+            if (percentage >= 80) return 'A*';
+            if (percentage >= 74) return 'A';
+            if (percentage >= 67) return 'B';
+            if (percentage >= 55) return 'C';
+            if (percentage >= 42) return 'D';
+            if (percentage >= 32) return 'E';
+            return 'U';
+        }
+
+        function getGradeColor(grade) {
+            const colors = {
+                'A*': '#4caf50',
+                'A': '#66bb6a',
+                'B': '#8bc34a',
+                'C': '#ffc107',
+                'D': '#ff9800',
+                'E': '#ff5722',
+                'U': '#f44336'
+            };
+            return colors[grade] || '#666';
+        }
+
+        function checkAnswers() {
+            let correctCount = 0;
+            
+            // Track quiz completion in Google Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'quiz_check_answers', {
+                    'event_category': 'Quiz Interaction',
+                    'event_label': 'Check All Answers'
+                });
+            }
+            
+            questions.forEach((q, index) => {
+                const userAnswer = document.getElementById(`answer-${index}`).value.trim();
+                const feedbackDiv = document.getElementById(`feedback-${index}`);
+                
+                if (userAnswer === '') {
+                    feedbackDiv.innerHTML = '';
+                    return;
+                }
+                
+                currentAnswers[index] = userAnswer;
+                
+                // Simple keyword matching for basic assessment
+                const userWords = userAnswer.toLowerCase().split(/\s+/);
+                const correctWords = q.answer.toLowerCase().split(/\s+/);
+                
+                let matchCount = 0;
+                correctWords.forEach(word => {
+                    if (word.length > 3 && userWords.some(userWord => 
+                        userWord.includes(word) || word.includes(userWord))) {
+                        matchCount++;
+                    }
+                });
+                
+                const matchPercentage = matchCount / correctWords.length;
+                
+                if (matchPercentage > 0.6) {
+                    feedbackDiv.innerHTML = '<div class="correct">✓ Good answer!</div>';
+                    correctCount++;
+                } else if (matchPercentage > 0.3) {
+                    feedbackDiv.innerHTML = `
+                        <div class="incorrect">⚠ Partially correct - could be improved</div>
+                        <div class="model-answer">Model answer: ${q.answer}</div>
+                    `;
+                } else {
+                    feedbackDiv.innerHTML = `
+                        <div class="incorrect">✗ Needs improvement</div>
+                        <div class="model-answer">Model answer: ${q.answer}</div>
+                    `;
+                }
+            });
+            
+            const percentage = Math.round((correctCount / questions.length) * 100);
+            const grade = getGrade(percentage);
+            const gradeColor = getGradeColor(grade);
+            
+            document.getElementById('scoreDisplay').innerHTML = 
+                `Score: ${correctCount}/${questions.length} (${percentage}%)<br>
+                <span style="color: ${gradeColor}; font-size: 1.2em; font-weight: bold;">Grade: ${grade}</span>`;
+            
+            // Track quiz completion score in Google Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'quiz_completed', {
+                    'event_category': 'Quiz Results',
+                    'event_label': `Grade: ${grade} (${percentage}%)`,
+                    'value': percentage
+                });
+            }
+            
+            updateProgress();
+        }
+
+        function showAllAnswers() {
+            // Track when students view all answers
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'show_all_answers', {
+                    'event_category': 'Quiz Interaction',
+                    'event_label': 'Show All Answers'
+                });
+            }
+            
+            questions.forEach((q, index) => {
+                const feedbackDiv = document.getElementById(`feedback-${index}`);
+                feedbackDiv.innerHTML = `<div class="model-answer">Model answer: ${q.answer}</div>`;
+            });
+            showingAnswers = true;
+        }
+
+        function resetQuiz() {
+            // Track quiz resets
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'quiz_reset', {
+                    'event_category': 'Quiz Interaction',
+                    'event_label': 'Reset Quiz'
+                });
+            }
+            
+            // Reset timer
+            clearInterval(timerInterval);
+            timeRemaining = 110 * 60;
+            quizStarted = false;
+            document.getElementById('timerDisplay').style.display = 'none';
+            document.getElementById('timerDisplay').className = 'timer-display';
+            
+            // Show start screen again
+            document.getElementById('startScreen').style.display = 'block';
+            document.getElementById('quizArea').classList.remove('active');
+            
+            // Reset all answers and feedback
+            questions.forEach((q, index) => {
+                const answerInput = document.getElementById(`answer-${index}`);
+                const feedbackDiv = document.getElementById(`feedback-${index}`);
+                if (answerInput) {
+                    answerInput.value = '';
+                    answerInput.disabled = false;
+                }
+                if (feedbackDiv) {
+                    feedbackDiv.innerHTML = '';
+                }
+            });
+            
+            // Re-enable buttons
+            document.getElementById('checkAnswers').disabled = false;
+            document.getElementById('showAnswers').disabled = false;
+            
+            currentAnswers = {};
+            showingAnswers = false;
+            document.getElementById('scoreDisplay').innerHTML = '';
+            updateProgress();
+        }
+
+        // Event listeners
+        document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
+        document.getElementById('checkAnswers').addEventListener('click', checkAnswers);
+        document.getElementById('showAnswers').addEventListener('click', showAllAnswers);
+        document.getElementById('resetQuiz').addEventListener('click', resetQuiz);
+
+        // Track answers for progress
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('answer-input')) {
+                updateProgress();
+            }
+        });
+
+        // Initialize quiz
+        renderQuiz();
+    </script>
+</body>
+</html>
